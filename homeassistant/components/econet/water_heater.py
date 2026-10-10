@@ -165,9 +165,15 @@ class EcoNetWaterHeater(EcoNetEntity[WaterHeater], WaterHeaterEntity):
     @override
     def turn_away_mode_on(self) -> None:
         """Turn away mode on."""
-        self.water_heater.set_away_mode(True)
+        if WaterHeaterOperationMode.VACATION in self.water_heater.modes:
+            self.water_heater.set_mode(WaterHeaterOperationMode.VACATION)
+        else:
+            self.water_heater.set_away_mode(True)
 
     @override
     def turn_away_mode_off(self) -> None:
         """Turn away mode off."""
-        self.water_heater.set_away_mode(False)
+        if self.water_heater.supports_schedule:
+            self.water_heater.resume_schedule()
+        else:
+            self.water_heater.set_away_mode(False)
